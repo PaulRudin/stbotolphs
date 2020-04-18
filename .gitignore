@@ -106,3 +106,9 @@ venv.bak/
 # PyCharm
 .idea
 venv/
+
+# terraform
+.terraform/
+*.tf.json
+*.tfstate
+*.tfstate.backup
