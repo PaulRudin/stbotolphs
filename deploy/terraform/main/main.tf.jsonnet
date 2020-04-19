@@ -25,7 +25,16 @@ local creds = 'tfsecrets.json';
         billing_account: config.billing_account,
         org_id: '${data.google_project.%s.org_id}' % config.admin_project,
       },
-    },    
+    },
+
+    
+    google_project_iam_member: {
+      p: { 
+        project: config.project,
+        role: "roles/owner",
+        member: "user:paul@rudin.co.uk",
+      },
+    },
 
     local proj_mixin = {
       project: '${google_project.%s.project_id}' % config.project,
@@ -61,14 +70,13 @@ local creds = 'tfsecrets.json';
       [config.cluster_name + '_primary_nodes']: proj_mixin + {
         name: '%s-k8s-primary-node-pool' % config.cluster_name,
         location: config.zone,
-        cluster: config.cluster_name,
-
+        cluster:  config.cluster_name,
+        initial_node_count: 1,
         autoscaling: {
           max_node_count: 5,
           min_node_count: 1,
         },
         node_config: {
-          // it's probably worth doing a little bit of monitoring and analysis estimate the best kind of machines.
           machine_type: 'g1-small',
           metadata: {
             'disable-legacy-endpoints': true,

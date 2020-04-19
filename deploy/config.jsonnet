@@ -33,5 +33,7 @@
     // leave this alone unless you're sure you know what you're doing.
     admin_sa_name: "%s@%s.iam.gserviceaccount.com" % [self.admin_sa, self.admin_project],
 
+    // these users will have necessary permissions to deal with the project.
+    extra_users: ["paul@rudin.co.uk"]
   },
 }
