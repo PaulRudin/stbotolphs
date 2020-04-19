@@ -1,27 +1,50 @@
+local config = (import '../../config.jsonnet').gcloud;
+local creds = 'tfsecrets.json';
 {
-  config:: (import '../config.jsonnet').gcloud + {creds_file: 'tfsecrets.json'},
-
   provider: {
     google: {
-      project: $.config.project,
-      region: $.config.region,
-      credentials: $.config.creds_file,
+      region: config.region,
+      credentials: creds,
     },
   }, //provider
 
+  data: {
+    google_project: {
+      [config.admin_project]: {
+        project_id: config.admin_project,
+      }
+    },
+  },
   resource: {
 
     google_project: {
-      [$.config.project]: {
-        name: $.config.project,
-        project_id: $.config.project,
+      [config.project]: {
+        provider: 'google',
+        name: config.project,
+        project_id: config.project,
+        billing_account: config.billing_account,
+        org_id: '${data.google_project.%s.org_id}' % config.admin_project,
       },
+    },    
+
+    local proj_mixin = {
+      project: '${google_project.%s.project_id}' % config.project,
     },
 
+    google_project_service: {
+      k8s: proj_mixin + {
+        service: "container.googleapis.com",
+      },
+      billing: proj_mixin + {
+        service: "cloudbilling.googleapis.com",
+      },
+    },
+    // use the long form to establish the dependency graph
+
     google_container_cluster: {
-      [$.config.cluster_name]: {
-        name: $.config.cluster_name,
-        location: $.config.zone,
+      [config.cluster_name]: proj_mixin + {
+        name: config.cluster_name,
+        location: config.zone,
         remove_default_node_pool: true,
         initial_node_count: 1,
         master_auth: {
@@ -35,10 +58,10 @@
     }, // google_container_cluster
 
     google_container_node_pool: {
-      [$.config.cluster_name + '_primary_nodes']: {
-        name: '%s-k8s-primary-node-pool' % $.config.cluster_name,
-        location: $.config.zone,
-        cluster: '${google_container_cluster.primary.name}',
+      [config.cluster_name + '_primary_nodes']: proj_mixin + {
+        name: '%s-k8s-primary-node-pool' % config.cluster_name,
+        location: config.zone,
+        cluster: config.cluster_name,
 
         autoscaling: {
           max_node_count: 5,

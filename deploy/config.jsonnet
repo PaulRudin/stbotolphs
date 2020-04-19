@@ -12,11 +12,8 @@
     // this is the name of the service account that terraform runs as.
     admin_sa: "stbotolophs-admin",
 
-    // bucket in the admin project used for storing terraform state
-    tf_bucket: 'terraform/state',
-
     // this is the project within which all the resources needed for deploying the software will be created
-    project: "stbotolphs",
+    project: "stbots",
 
 
     // this should be a valid billing account; see a list via: gcloud alpha billing list
@@ -31,7 +28,7 @@
     // doesn't really matter
     cluster_name: self.project,
 
-    tfbucket: "%s-tfstate" % self.project,
+    tfbucket: "%s-tfstate" % self.admin_project,
 
     // leave this alone unless you're sure you know what you're doing.
     admin_sa_name: "%s@%s.iam.gserviceaccount.com" % [self.admin_sa, self.admin_project],
