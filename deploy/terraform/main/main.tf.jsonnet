@@ -1,8 +1,9 @@
 local config = (import '../../config.jsonnet').gcloud;
 local creds = 'tfsecrets.json';
+local utils = import '../utils.jsonnet';
 {
   provider: {
-    google: {
+    "google-beta": {
       region: config.region,
       credentials: creds,
     },
@@ -12,7 +13,10 @@ local creds = 'tfsecrets.json';
     google_project: {
       [config.admin_project]: {
         project_id: config.admin_project,
-      }
+      },
+      [config.project]: {
+        project_id: config.project,
+      },
     },
   },
   resource: {
@@ -29,15 +33,16 @@ local creds = 'tfsecrets.json';
 
     
     google_project_iam_member: {
-      p: { 
+      [utils.sanitize_name(u)]: { 
         project: config.project,
         role: "roles/owner",
-        member: "user:paul@rudin.co.uk",
-      },
+        member: 'user:%s' % u,
+      } for u in config.extra_users
     },
 
+    local project = '${google_project.%s.project_id}' % config.project,
     local proj_mixin = {
-      project: '${google_project.%s.project_id}' % config.project,
+      project: project,
     },
 
     google_project_service: {
@@ -46,6 +51,9 @@ local creds = 'tfsecrets.json';
       },
       billing: proj_mixin + {
         service: "cloudbilling.googleapis.com",
+      },
+      networking: proj_mixin + {
+        service: "servicenetworking.googleapis.com",
       },
     },
     // use the long form to establish the dependency graph
@@ -63,6 +71,15 @@ local creds = 'tfsecrets.json';
             issue_client_certificate: false,
           },
         },
+
+        // vpc native in order to permit private ip communication with
+        // postgres etc.
+        ip_allocation_policy: {
+          // blank - gets chosen for you
+          cluster_ipv4_cidr_block: '',
+          services_ipv4_cidr_block: '',
+        },
+
       },
     }, // google_container_cluster
 
@@ -91,6 +108,64 @@ local creds = 'tfsecrets.json';
             'https://www.googleapis.com/auth/ndev.clouddns.readwrite',
           ],
         },
+      },
+    },
+
+
+    google_container_registry: {
+      registry: proj_mixin + {
+        location: 'EU',
+      },
+    },
+
+    google_storage_bucket_iam_member: {
+      [utils.sanitize_name(u)]: {
+        bucket: '${google_container_registry.registry.id}',
+        role: 'roles/storage.admin',
+        member: 'user:%s' % u,
+      } for u in config.extra_users
+    },
+
+    google_compute_global_address: {
+      default: proj_mixin + {
+        name: 'google-managed-services-default',
+        address_type: 'INTERNAL',
+        prefix_length: 16,
+        purpose: "VPC_PEERING",
+        network: "default",
+      }
+    },
+
+    local network = (
+      'https://compute.googleapis.com/compute/v1/projects/%s/global/networks/default' % config.project
+    ),
+    
+    google_service_networking_connection: {
+      peer: {
+        network: network,
+        service: 'servicenetworking.googleapis.com',
+        reserved_peering_ranges: ['google-managed-services-default'],
+      },
+    },
+ 
+    google_sql_database_instance: {
+      [config.postgres.name]: config.postgres + proj_mixin + {
+        settings+: {
+          ip_configuration: {
+            private_network: network,
+          },
+        },
+      },
+    },
+
+
+    // this is stuff useful outside of terraform
+    local_file: {
+      tfdata: {
+        content: std.manifestJsonEx({
+          registry: 'eu.gcr.io/%s' % project,
+        }, '  '),
+        filename: '../../tfdata.json',
       },
     },
   }, //resource

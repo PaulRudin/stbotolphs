@@ -1,4 +1,5 @@
 local config  = (import '../../config.jsonnet').gcloud;
+local utils = import '../utils.jsonnet';
 
 {
   provider: {
@@ -33,12 +34,13 @@ local config  = (import '../../config.jsonnet').gcloud;
       "cloudapis.googleapis.com",
       "compute.googleapis.com",
       "container.googleapis.com",
+      "sqladmin.googleapis.com",
     ],
 
     /* note that these sometime fail on newly created/modified projects
      just retry after a minute */
     google_project_service: {
-      [std.strReplace(s, '.', '_')]: {
+      [utils.sanitize_name(s)]: {
         project: config.admin_project,
         service: s,
         depends_on: ['google_project.%s' % config.admin_project],
@@ -53,12 +55,10 @@ local config  = (import '../../config.jsonnet').gcloud;
       },
     },
 
-    /* the credentials for the provider already establish an owner, we could
-     remove that for a little extra security and protection against mistakes, but
-     it makes things tricky for manual inpection and fettling */
-
+   
     local roles = {
       owner: 'roles/owner',
+      sql: 'roles/cloudsql.admin',
     },
     google_project_iam_member: {
       [k]: {
