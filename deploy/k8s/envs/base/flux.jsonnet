@@ -40,7 +40,6 @@
               args: [
                 '--memcached-service=',
                 '--ssh-keygen-dir=%s' % kgdir,
-                '--git-readonly',
                 '--git-url=%s' % config.flux.git_url,
                 '--git-path=%s' % config.flux.git_path,
                 '--git-branch=%s' % config.flux.git_branch,

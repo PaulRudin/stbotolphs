@@ -1,4 +1,4 @@
 version: 1
 commandUpdated:
   generators:
-    - command: make env=$(ENV) all.jsonnet
+    - command: make env=$(ENV) update
