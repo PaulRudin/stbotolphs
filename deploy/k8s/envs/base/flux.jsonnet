@@ -46,6 +46,8 @@
                 '--git-label=flux-sync',
                 '--git-email=%s' % config.flux.git_email,
                 '--manifest-generation=true',
+                '--sync-interval=10m',
+                '--sync-timeout=5m',
               ],
               env_: {
                 ENV: env,
