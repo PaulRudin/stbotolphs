@@ -19,8 +19,8 @@ decrypted_secrets = $(encrypted_secrets:.enc.json=.json)
 sealed_secrets = $(decrypted_secrets:.json=.sealed.json)
 
 show: $(sealed_secrets)
-	cd $(kdir)
-	$(KUBECFG) show all.jsonnet
+	@cd $(kdir)
+	@$(KUBECFG) show all.jsonnet
 
 update: $(sealsed_secrets)
 	cd $(kdir)
