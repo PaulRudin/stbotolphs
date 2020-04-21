@@ -19,7 +19,9 @@ local config = {
     root_dns_name:: 'stbots.rudin.co.uk', // atm dns record needs to be updated manually
     k:: import 'klib.libsonnet',
     env:: std.extVar("env"),
-    tfdata:: import '../../../tfsecrets.json',
+    tfdata:: import '../../tfdata.json',
+    tfsecrets:: import '../../tfsecrets.json',
+    extsecrets:: import '../../external-secrets.json',
     config:: import '../../../config.jsonnet',
   },
 };

@@ -7,26 +7,25 @@ kdir := ./envs/$(env)/
 KUBECFG := kubecfg -V "env=$(env)" -J $(mkfile_dir) -J $(mkfile_dir)vendor --context stbots-$(env)
 JSONNET := jsonnet -J $(mkfile_dir)
 
+%secrets.json: %secrets.enc.json
+	sops -d $< > $@
+
 %secrets.sealed.json: %secrets.json
 	$(JSONNET) --tla-code-file 'secrets=$<' utils/secrets.jsonnet|kubeseal --cert $(@D)/kubeseal-public-cert.pem -o json > $@
 
-kubeseal-public-cert.pem:
-	kubeseal --fetch-cert > $@
 
-raw_secrets = $(shell find envs/ -type f -name '*secrets.json')
-sealed_secrets = $(pathsubst envs/%.secrets.json envs/%.secrets.sealed.json)
-seal_all: $(sealed_secrets)
+encrypted_secrets = $(shell find . -type f -name '*secrets.enc.json')
+decrypted_secrets = $(encrypted_secrets:.enc.json=.json)
 
-
-show:
+show: $(decrypted_secrets)
 	cd $(kdir)
 	$(KUBECFG) show all.jsonnet
 
-update:
+update: $(decrypted_secrets)
 	cd $(kdir)
 	$(KUBECFG) update --ignore-unknown all.jsonnet
 
-diff:
+diff: $(decrypted_secrets)
 	cd $(kdir)
 	$(KUBECFG) diff --diff-strategy=subset all.jsonnet
 
@@ -42,4 +41,4 @@ fmttest: $(JS_FILES:%=%-fmttest)
 %-fmttest: %
 	jsonnetfmt --test $<
 
-.PHONY: show update diff %-fmt %-fmttest fmt fmttest seal_all
+.PHONY: show update diff %-fmt %-fmttest fmt fmttest decrypt_secrets

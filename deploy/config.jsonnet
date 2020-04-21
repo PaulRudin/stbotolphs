@@ -6,12 +6,29 @@
 
   k8s: {
 
+    flux: {
+      /* flux will pull from this github repo to apply latest k8s manifests. (Assumed to be public.) */
+      
+      git_url: 'git@github.com:PaulRudin/stbotolphs',
+      git_branch: 'master',
+
+      git_path: 'deploy/k8s',
+      
+      // doesn't actually matter as we're not going to push commits/tags.
+      git_email: $.k8s.letsencrypt_email,
+    },
+
+    
     /* this will appear on certificate requests to lets encrypt, doesn't
     actually matter, but letencrypt will send expiry warnings */
-    
+ 
     letsencrypt_email: 'paul@rudin.co.uk',
-  },
 
+    // for the django superuser
+    django_email: self.letsencrypt_email,
+
+    
+  },
 
   gcloud: {
 

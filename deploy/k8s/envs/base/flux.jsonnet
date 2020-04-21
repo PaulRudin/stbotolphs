@@ -5,6 +5,7 @@
   local k = $.globals.k,
   local env = $.globals.env,
   local name = 'flux',
+  local config = $.globals.config.k8s,
 
   # seems that this has to be the name. not sure why
   local secret_name = 'flux-git-deploy',
@@ -39,11 +40,12 @@
               args: [
                 '--memcached-service=',
                 '--ssh-keygen-dir=%s' % kgdir,
-                '--git-url=git@github.com:PaulRudin/xamaral',
-                '--git-path=k8s',
-                '--git-branch=master',
+                '--git-readonly',
+                '--git-url=%s' % config.flux.git_url,
+                '--git-path=%s' % config.flux.git_path,
+                '--git-branch=%s' % config.flux.git_branch,
                 '--git-label=flux-sync',
-                '--git-email=paul+flux@rudin.co.uk',
+                '--git-email=%s' % config.flux.git_email,
                 '--manifest-generation=true',
               ],
               env_: {

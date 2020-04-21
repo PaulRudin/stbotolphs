@@ -53,6 +53,7 @@ local utils = import '../utils.jsonnet';
     },
 
     google_project_service: {
+      //FIXME: refactor
       k8s: proj_mixin + {
         service: "container.googleapis.com",
       },
@@ -62,6 +63,9 @@ local utils = import '../utils.jsonnet';
       networking: proj_mixin + {
         service: "servicenetworking.googleapis.com",
       },
+      kms: proj_mixin + {
+        service: "cloudkms.googleapis.com",
+      }
     },
     // use the long form to establish the dependency graph
 
@@ -186,22 +190,61 @@ local utils = import '../utils.jsonnet';
       staging: proj_mixin + { instance: instance, name: 'staging' },
     },
 
-    /* this is stuff useful outside of terraform - note that we use
-       *secrets.json so that git-crypt will encrypt. Not everything is actually
-       secret, but it doesn't matter.  */
+
+    google_kms_key_ring: {
+      key_ring: proj_mixin + {
+        name: 'key_ring',
+        location: config.region,
+      }
+    },
+
+    google_kms_crypto_key: {
+      crypto_key: {
+        name: 'crypto_key',
+        key_ring: '${google_kms_key_ring.key_ring.self_link}'
+      },
+    }, 
     
+    // this is for data that isn't sensitive
     local_file: {
       tfdata: {
         content: std.manifestJsonEx({
           registry: 'eu.gcr.io/%s' % project,
+          
+          // this is just names the key name - it's not sensitive
+          crypto_key: '${google_kms_crypto_key.crypto_key.self_link}',
+
           postgres: {
             ip: '${google_sql_database_instance.%s.private_ip_address}' % config.postgres.name,
             user: 'postgres',
-            password: '${random_password.postgres_pw.result}',
           },
         }, '  '),
-        filename: '../../tfsecrets.json',
+        filename: '../../k8s/tfdata.json',
       },
     },
+
+    null_resource: {
+      sopsdata: {
+        provisioner: {
+          
+          // this creates a sops encypted file for sensitive data, it depends on sops being present
+          'local-exec': {
+
+            local content = std.escapeStringBash(std.manifestJsonEx({
+              postgres_password: '${random_password.postgres_pw.result}',
+              
+            }, '  ')),
+            command: (
+              'echo -n %s |' % content +
+              'sops --encrypt --gcp-kms ${google_kms_crypto_key.crypto_key.self_link}' +
+              ' --input-type json --output-type json /dev/stdin > ../../k8s/tfsecrets.enc.json'
+            ),
+          },
+        },
+      },
+    },
+
+      
+    
   }, //resource
 }

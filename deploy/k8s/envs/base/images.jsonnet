@@ -1,4 +1,4 @@
-local tfdata = import '../../../tfsecrets.json';
+local tfdata = import '../../tfdata.json';
 {
   postgres: 'postgres:11.4',
   webapp: '%s/webapp:latest' % tfdata.registry,
