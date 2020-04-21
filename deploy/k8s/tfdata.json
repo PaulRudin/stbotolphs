@@ -1,0 +1,8 @@
+{
+  "crypto_key": "projects/stbots/locations/europe-west2/keyRings/key_ring/cryptoKeys/crypto_key",
+  "postgres": {
+    "ip": "10.3.0.3",
+    "user": "postgres"
+  },
+  "registry": "eu.gcr.io/stbots"
+}
