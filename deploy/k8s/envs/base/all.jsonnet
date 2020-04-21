@@ -8,20 +8,23 @@ local config = {
   
   secretgen: import 'secretgen.jsonnet',
 
-  //global_secret: import 'globalsecrets.sealed.json',
+  secrets: {
+    external: import 'external-secrets.sealed.json',
+    tf: import 'tfsecrets.sealed.json',
+  },
 
   sealed_secrets_controller: import 'sealed-secrets-controller.jsonnet',
 
   flux: import 'flux.jsonnet',
 
+  //gcloud: import 'gcloud-id.jsonnet',
+  
   globals:: {
     images:: import 'images.jsonnet',
     root_dns_name:: 'stbots.rudin.co.uk', // atm dns record needs to be updated manually
     k:: import 'klib.libsonnet',
     env:: std.extVar("env"),
     tfdata:: import '../../tfdata.json',
-    tfsecrets:: import '../../tfsecrets.json',
-    extsecrets:: import '../../external-secrets.json',
     config:: import '../../../config.jsonnet',
   },
 };

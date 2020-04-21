@@ -16,6 +16,8 @@ local utils = import '../utils.jsonnet';
     },
   }, //provider
 
+  local provider_beta_mix = {provider: 'google-beta'},
+
   data: {
     google_project: {
       [config.admin_project]: {
@@ -38,14 +40,6 @@ local utils = import '../utils.jsonnet';
       },
     },
 
-    
-    google_project_iam_member: {
-      [utils.sanitize_name(u)]: { 
-        project: config.project,
-        role: "roles/owner",
-        member: 'user:%s' % u,
-      } for u in config.extra_users
-    },
 
     local project = '${google_project.%s.project_id}' % config.project,
     local proj_mixin = {
@@ -70,7 +64,7 @@ local utils = import '../utils.jsonnet';
     // use the long form to establish the dependency graph
 
     google_container_cluster: {
-      [config.cluster_name]: proj_mixin + {
+      [config.cluster_name]: provider_beta_mix + proj_mixin + {
         name: config.cluster_name,
         location: config.zone,
         remove_default_node_pool: true,
@@ -92,6 +86,9 @@ local utils = import '../utils.jsonnet';
           services_ipv4_cidr_block: '',
         },
 
+        workload_identity_config: {
+          identity_namespace: '%s.svc.id.goog' % project,
+        },
       },
     }, // google_container_cluster
 
@@ -123,6 +120,42 @@ local utils = import '../utils.jsonnet';
       },
     },
 
+    local sa_name = 'cnrm-system',
+    local sa_full_name = '%s@%s.iam.gserviceaccount.com' % [sa_name, project],
+    google_service_account: {
+      cnrm_system: {
+        project: project,
+        account_id: sa_name,
+      },
+    },
+
+    // give the sa owner perms on the project
+    local roles = {
+      owner: 'roles/owner',
+    },
+    google_project_iam_member: {
+
+      [utils.sanitize_name(u)]: { 
+        project: config.project,
+        role: "roles/owner",
+        member: 'user:%s' % u,
+      } for u in config.extra_users
+    } + {
+      [k]: {
+        project: config.project,
+        role: roles[k],
+        member: 'serviceAccount:%s' % sa_full_name,
+      } for k in std.objectFields(roles)
+    },
+
+    // create a binding between the sa and the pre-defined k8s sa
+    google_service_account_iam_member: {
+      k8s: {
+        service_account_id: '${google_service_account.cnrm_system.id}',
+        role: 'roles/iam.workloadIdentityUser',
+        member: 'serviceAccount:%s.svc.id.goog[cnrm-system/cnrm-controller-manager]' % project,
+      },
+    },
 
     google_container_registry: {
       registry: proj_mixin + {
@@ -225,13 +258,15 @@ local utils = import '../utils.jsonnet';
 
     null_resource: {
       sopsdata: {
+        //triggers: {always_run: '${timestamp()}'},
         provisioner: {
           
           // this creates a sops encypted file for sensitive data, it depends on sops being present
           'local-exec': {
 
             local content = std.escapeStringBash(std.manifestJsonEx({
-              postgres_password: '${random_password.postgres_pw.result}',
+              data: {postgres_password: '${random_password.postgres_pw.result}'},
+              name: 'tfsecrets',
               
             }, '  ')),
             command: (

@@ -4,13 +4,8 @@ local port = 8080;
   local g = $.globals,
   config:: {
     dbname: 'prod',
-    dbpassword: g.tfsecrets.postgres_password,
     dbuser: g.tfdata.postgres.user,
     dbhost: g.tfdata.postgres.ip,
-    mail_user: g.extsecrets.sendgrid.user,
-    mail_password: g.extsecrets.sendgrid.password,
-    mail_host: g.extsecrets.sendgrid.host,
-    mail_port: g.extsecrets.sendgrid.port,
   },
   local k = $.globals.k,
   svc: k.Service(name) {
@@ -46,26 +41,39 @@ local port = 8080;
       replicas: 1,
       template+: {
         spec+: {
+          local envmap = {
+            DJANGO_EMAIL_HOST_USER: 'sendgrid_user',
+            
+            DJANGO_EMAIL_HOST_PASSWORD: 'sendgrid_password',
+            DJANGO_EMAIL_PORT: 'sendgrid_port',
+            DJANGO_EMAIL_HOST: 'sendgrid_host',
+          },
           local env_data = {
             DJANGO_DB_ENGINE: 'django.db.backends.postgresql',
             DJANGO_DB_HOST: $.config.dbhost,
             DJANGO_DB_NAME: $.config.dbname,
             DJANGO_DB_USER: $.config.dbuser,
-            DJANGO_DB_PASSWORD: $.config.dbpassword,
             DJANGO_DB_PORT: '5432',
             DJANGO_DB_CONN_MAX_AGE: '60',
-
-            DJANGO_EMAIL_HOST_USER: $.config.mail_user,
-            DJANGO_EMAIL_HOST_PASSWORD: $.config.mail_password,
-            DJANGO_EMAIL_PORT: $.config.mail_port,
-            DJANGO_EMAIL_HOST: $.config.mail_host,
-
-
-
+          } + {
+            [k]: {
+              secretKeyRef: {
+                name: 'external-secrets',
+                key: envmap[k],
+              },
+            } for k in std.objectFields(envmap)
+          } + {
             DJANGO_SECRET_KEY: {
               secretKeyRef: {
                 name: name,
                 key: 'django_secret_key',
+              },
+            },
+
+            DJANGO_DB_PASSWORD: {
+              secretKeyRef: {
+                name: 'tfsecrets',
+                key: 'postgres_password',
               },
             },
           },

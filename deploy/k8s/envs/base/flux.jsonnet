@@ -73,7 +73,13 @@
 
   secret: k.Secret(secret_name) + nsmix,
 
-  sa: k.ServiceAccount(name) + nsmix,
+  sa: k.ServiceAccount(name) + nsmix + {
+    metadata+: {
+      annotations+: {
+        'iam.gke.io/gcp-service-account': 'cnrm-system@stbots.iam.gserviceaccount.com',
+      },
+    },
+  },
 
   cr: k.ClusterRole(name) {
     rules: [
