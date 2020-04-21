@@ -1,58 +1,25 @@
-local name = 'secretgen';
-local namespace = 'kube-system';
 {
-  local k = $.globals.k,
+  _config:: {
+    namespace: 'kube-system',
+    image: $.globals.images.secretgen,
+  },
+  local ns_mixin = { metadata+: {namespace: $._config.namespace }},
 
-  deployment: k.Deployment(name) {
-    metadata+: {
-      namespace: namespace,
-    },
-    spec+: {
-      replicas: 1,
-      template+: {
-        spec+: {
-          serviceAccountName: name,
-          containers_: {
-            secretgen: {
-              image: $.globals.images.secret_gen,
-              command: ['/kubernetes-secret-generator'],
-              // 32 because oauth2-proxy cookie secret can only be certain lengths
-              args: ['-logtostderr', '-all-namespaces', '-regenerate-insecure', '-secret-length=32'],
-            },
-          },
-        },
-      },
-    },
+  operator: std.native('parseYaml')(importstr 'secretgen/operator.yaml')[0] + ns_mixin + {
+    spec+: {template+: {spec+: {containers: [
+      super.containers[0] + {
+        image: $._config.image,
+        command: null,
+      }
+    ]}}}
   },
 
-  clusterRole: k.ClusterRole(name) {
-    rules: [
-      {
-        apiGroups: [''],
-        resources: ['secrets'],
-        verbs: ['get', 'watch', 'list', 'update'],
-      },
-    ],
-  },
+  role_binding: std.native('parseYaml')(importstr 'secretgen/role_binding.yaml')[0] + ns_mixin,
+  role: std.native('parseYaml')(importstr 'secretgen/role.yaml')[0] + ns_mixin,
 
-  crb: k.ClusterRoleBinding(name) {
-    roleRef: {
-      kind: 'ClusterRole',
-      name: name,
-      apiGroup: 'rbac.authorization.k8s.io',
-    },
-    subjects: [
-      {
-        kind: 'ServiceAccount',
-        name: name,
-        namespace: namespace,
-      },
-    ],
-  },
+  service_account: std.native('parseYaml')(importstr 'secretgen/service_account.yaml')[0] + ns_mixin,
 
-  sa: k.ServiceAccount(name) {
-    metadata+: {
-      namespace: namespace,
-    },
+  cluster_role_binding: std.native('parseYaml')(importstr 'secretgen/cluster_role_binding.yaml')[0] + {
+    subjects: [super.subjects[0] + {namespace: $._config.namespace}]
   },
 }

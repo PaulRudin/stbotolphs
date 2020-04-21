@@ -6,6 +6,13 @@ local utils = import '../utils.jsonnet';
     "google-beta": {
       region: config.region,
       credentials: creds,
+      version: '~> 3.17',
+    },
+    "local": {
+      version: '~> 1.4',
+    },
+    random: {
+      version: '~> 2.2',
     },
   }, //provider
 
@@ -64,6 +71,7 @@ local utils = import '../utils.jsonnet';
         location: config.zone,
         remove_default_node_pool: true,
         initial_node_count: 1,
+        min_master_version: '1.15',
         master_auth: {
           username: '',
           password: '',
@@ -158,14 +166,41 @@ local utils = import '../utils.jsonnet';
       },
     },
 
+    random_password: {
+      postgres_pw: {
+        length: 16,
+      },
+    },
 
-    // this is stuff useful outside of terraform
+    local instance = '${google_sql_database_instance.%s.name}' % config.postgres.name,
+    google_sql_user: {
+      postgres_su: proj_mixin + {
+        name: 'postgres',
+        password: '${random_password.postgres_pw.result}',
+        instance: instance
+      },
+    },
+
+    google_sql_database: {
+      prod: proj_mixin + { instance: instance, name: 'prod' },
+      staging: proj_mixin + { instance: instance, name: 'staging' },
+    },
+
+    /* this is stuff useful outside of terraform - note that we use
+       *secrets.json so that git-crypt will encrypt. Not everything is actually
+       secret, but it doesn't matter.  */
+    
     local_file: {
       tfdata: {
         content: std.manifestJsonEx({
           registry: 'eu.gcr.io/%s' % project,
+          postgres: {
+            ip: '${google_sql_database_instance.%s.private_ip_address}' % config.postgres.name,
+            user: 'postgres',
+            password: '${random_password.postgres_pw.result}',
+          },
         }, '  '),
-        filename: '../../tfdata.json',
+        filename: '../../tfsecrets.json',
       },
     },
   }, //resource

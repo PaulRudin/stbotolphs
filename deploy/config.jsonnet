@@ -3,6 +3,16 @@
 */
 
 {
+
+  k8s: {
+
+    /* this will appear on certificate requests to lets encrypt, doesn't
+    actually matter, but letencrypt will send expiry warnings */
+    
+    letsencrypt_email: 'paul@rudin.co.uk',
+  },
+
+
   gcloud: {
 
     // this should be a valid billing account; see a list via: gcloud alpha billing list
