@@ -6,6 +6,8 @@ local port = 8080;
     dbname: 'prod',
     dbuser: g.tfdata.postgres.user,
     dbhost: g.tfdata.postgres.ip,
+    bucket: g.tfdata.cms_bucket_name,
+    region: g.config.gcloud.region,
   },
   local k = $.globals.k,
   svc: k.Service(name) {
@@ -41,14 +43,28 @@ local port = 8080;
       replicas: 1,
       template+: {
         spec+: {
-          local envmap = {
+          local ext_envmap = {
             DJANGO_EMAIL_HOST_USER: 'sendgrid_user',
-            
             DJANGO_EMAIL_HOST_PASSWORD: 'sendgrid_password',
             DJANGO_EMAIL_PORT: 'sendgrid_port',
             DJANGO_EMAIL_HOST: 'sendgrid_host',
           },
+
+          local tfs_envmap = {
+            
+            DJANGO_AWS_ACCESS_KEY_ID: 'cms_bucket_key_id',
+            DJANGO_AWS_SECRET_ACCESS_KEY: 'cms_bucket_key_secret',
+            DJANGO_DB_PASSWORD: 'postgres_password',
+          },
+          
           local env_data = {
+            DJANGO_USE_AWS: '1',
+            DJANGO_AWS_LOCATION: '',
+            DJANGO_AWS_S3_REGION_NAME: $.config.region,
+            // not sure why host and endpoint are both needed
+            DJANGO_AWS_S3_HOST: 'storage.googleapis.com',
+            DJANGO_AWS_S3_ENDPOINT_URL: 'https://storage.googleapis.com/',
+            DJANGO_AWS_STORAGE_BUCKET_NAME: $.config.bucket,
             DJANGO_DB_ENGINE: 'django.db.backends.postgresql',
             DJANGO_DB_HOST: $.config.dbhost,
             DJANGO_DB_NAME: $.config.dbname,
@@ -59,21 +75,21 @@ local port = 8080;
             [k]: {
               secretKeyRef: {
                 name: 'external-secrets',
-                key: envmap[k],
+                key: ext_envmap[k],
               },
-            } for k in std.objectFields(envmap)
+            } for k in std.objectFields(ext_envmap)
+          } + {
+            [k]: {
+              secretKeyRef: {
+                name: 'tfsecrets',
+                key: tfs_envmap[k],
+              },
+            } for k in std.objectFields(tfs_envmap)
           } + {
             DJANGO_SECRET_KEY: {
               secretKeyRef: {
                 name: name,
                 key: 'django_secret_key',
-              },
-            },
-
-            DJANGO_DB_PASSWORD: {
-              secretKeyRef: {
-                name: 'tfsecrets',
-                key: 'postgres_password',
               },
             },
           },

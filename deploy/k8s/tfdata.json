@@ -1,4 +1,5 @@
 {
+  "cms_bucket_name": "stbots-cms",
   "crypto_key": "projects/stbots/locations/europe-west2/keyRings/key_ring/cryptoKeys/crypto_key",
   "postgres": {
     "ip": "10.3.0.3",
