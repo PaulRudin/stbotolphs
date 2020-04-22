@@ -24,7 +24,11 @@ jobs:
           
       - name: install creds file
         working-directory: ./deploy
-        run: echo ${{secrets.GOOGLE_KEY}} > ./terraform/main/tfsecrets.json
+        shell: bash
+        env:
+          GKEY: ${{secrets.GOOGLE_KEY}}
+        run: 'echo "$GKEY" > ./terraform/main/tfsecrets.json
 
       - name: run terraform apply
+        working-directory: ./deploy
         run: make tfapply
