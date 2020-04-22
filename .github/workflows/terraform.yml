@@ -20,13 +20,11 @@ jobs:
           rm jsonnet-bin-v0.15.0-linux.tar.gz
           chmod a+x jsonnet
           sudo install jsonnet /usr/local/bin/jsonnet
-
-      - name: install make
-        run: sudo apt-get install make
         
           
+      - name: install creds file
+        working-directory: ./deploy
+        run: echo ${{secrets.GOOGLE_KEY}} > ./terraform/main/tfsecrets.json
+
       - name: run terraform apply
-        run: |
-          echo ${{secrets.GOOGLE_KEY}} > deploy/terraform/main/tfsecrets.json
-          cd deploy
-          make tfapply
+        run: make tfapply
