@@ -29,6 +29,10 @@ jobs:
           GKEY: ${{secrets.GOOGLE_KEY}}
         run: 'echo "$GKEY" > ./terraform/main/tfsecrets.json'
 
+      - name: run tf init
+        working-directory: ./deploy
+        run: make tfinit
+
       - name: run terraform apply
         working-directory: ./deploy
         run: make tfapply
