@@ -21,6 +21,8 @@ jobs:
           chmod a+x jsonnet
           sudo install jsonnet /usr/local/bin/jsonnet
 
+      - name: install make
+        run: sudo apt-get install make
         
           
       - name: run terraform apply
