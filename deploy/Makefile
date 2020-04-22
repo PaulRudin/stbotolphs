@@ -4,6 +4,9 @@
 .DEFAULT_GOAL := tfapply
 .PHONY: tfbootstrap tfinit tfplan tfapply tfshow tfdestroy
 
+
+makefile_dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 jsonnet = jsonnet
 
 bootstrap_files = terraform/bootstrap/main.tf.json
@@ -12,17 +15,21 @@ js_files := $(shell find . -type f -name '*.jsonnet')
 %.tf.json: %.tf.jsonnet $(js_files)
 	$(jsonnet) $< -o $@
 
+
+tf_dir = $(makefile_dir)terraform/main/
+tf_files := $(tf_dir)main.tf.json $(tf_dir)backend.tf.json
+tf_triggers := $(js_files) $(tf_files)
+creds_file := $(tf_dir)tfsecrets.json
+
 # one off step so that we have credentials to do everything else.
 tfbootstrap: $(bootstrap_files)
 	cd terraform/bootstrap; \
 	terraform init; \
 	terraform apply -auto-approve
 
-tf_dir = terraform/main/
-tf_files := $(tf_dir)main.tf.json $(tf_dir)backend.tf.json
-tf_triggers := $(js_files) $(tf_files)
 
-tf = terraform
+
+tf := GOOGLE_APPLICATION_CREDENTIALS=$(creds_file) terraform
 
 tfinit: $(tf_triggers)
 	cd $(tf_dir); $(tf) init

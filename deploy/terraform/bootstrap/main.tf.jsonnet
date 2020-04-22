@@ -35,6 +35,7 @@ local utils = import '../utils.jsonnet';
       "compute.googleapis.com",
       "container.googleapis.com",
       "sqladmin.googleapis.com",
+      "cloudkms.googleapis.com",
     ],
 
     /* note that these sometime fail on newly created/modified projects

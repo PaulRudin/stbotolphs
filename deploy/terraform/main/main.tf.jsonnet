@@ -39,32 +39,14 @@ local utils = import '../utils.jsonnet';
         filename: '../../k8s/tfdata.json',
       },
     },
+  } + utils.sops_out(
+    '../../k8s/tfsecrets.enc.json',
+    '${google_kms_crypto_key.crypto_key.self_link}',
+    {
+      postgres_password: '${random_password.postgres_pw.result}',
+      cms_bucket_key_id: '${google_storage_hmac_key.%s.access_id}' % $.cms_storage_bucket_key_name,
+      cms_bucket_key_secret: '${google_storage_hmac_key.%s.secret}' % $.cms_storage_bucket_key_name,
+    }
+  )
+} 
 
-    null_resource+: {
-      sopsdata: {
-        //triggers: {always_run: '${timestamp()}'},
-        provisioner: {
-          
-          // this creates a sops encypted file for sensitive data, it depends on sops being present
-          'local-exec': {
-
-            local content = std.escapeStringBash(std.manifestJsonEx({
-              data: {
-                postgres_password: '${random_password.postgres_pw.result}',
-                cms_bucket_key_id: '${google_storage_hmac_key.%s.access_id}' % $.cms_storage_bucket_key_name,
-                cms_bucket_key_secret: '${google_storage_hmac_key.%s.secret}' % $.cms_storage_bucket_key_name,
-              },
-              name: 'tfsecrets',
-              
-            }, '  ')),
-            command: (
-              'echo -n %s |' % content +
-              'sops --encrypt --gcp-kms ${google_kms_crypto_key.crypto_key.self_link}' +
-              ' --input-type json --output-type json /dev/stdin > ../../k8s/tfsecrets.enc.json'
-            ),
-          },
-        },
-      },
-    },
-  }, //resource
-}

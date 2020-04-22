@@ -1,10 +1,9 @@
-local creds = 'tfsecrets.json';
 {
   local config = $.config,
+  
   provider+: {
     "google-beta": {
       region: config.region,
-      credentials: creds,
       version: '~> 3.17',
     },
     "local": {
