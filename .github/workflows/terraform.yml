@@ -10,10 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: check if terraform present
-        run: |
-          ls
-          which terraform
+      - name: Install terraform
+        uses: little-core-labs/install-terraform@v1
+
           
       - name: run terraform apply
         run: |
