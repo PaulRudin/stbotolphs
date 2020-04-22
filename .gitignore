@@ -112,3 +112,5 @@ venv/
 *.tf.json
 *.tfstate
 *.tfstate.backup
+# generated intermediate secrets files:
+*secrets.json
