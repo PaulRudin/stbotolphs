@@ -6,15 +6,12 @@ on:
 jobs:
   apply:
     runs-on: ubuntu-18.04
+    container: bitnami:jsonnet
     steps:
       - uses: actions/checkout@v2
-
+        
       - name: run terraform apply
         run: |
-          wget https://github.com/google/jsonnet/releases/download/v0.15.0/jsonnet-bin-v0.15.0-linux.tar.gz
-          tar xzf jsonnet-bin-v0.15.0-linux.tar.gz
-          chmod a+x jsonnet
-          install jsonnet /usr/local/bin/jsonnet
           echo ${{secrets.GOOGLE_KEY}} > deploy/terraform/main/tfsecrets.json
           cd deploy
           make tfapply
