@@ -41,7 +41,7 @@ tfshow: $(tf_triggers)
 	cd $(tf_dir); $(tf) show
 
 tfapply: $(tf_triggers)
-	cd $(tf_dir); $(tf) apply
+	cd $(tf_dir); $(tf) apply -auto-approve
 
 tfdestroy: $(tf_triggers)
 	cd $(tf_dir); $(tf) destroy
