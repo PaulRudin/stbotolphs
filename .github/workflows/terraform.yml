@@ -9,7 +9,12 @@ jobs:
     container: bitnami/jsonnet
     steps:
       - uses: actions/checkout@v2
-        
+
+      - name: check if terraform present
+        run: |
+          ls
+          which terraform
+          
       - name: run terraform apply
         run: |
           echo ${{secrets.GOOGLE_KEY}} > deploy/terraform/main/tfsecrets.json
