@@ -27,7 +27,7 @@ jobs:
         shell: bash
         env:
           GKEY: ${{secrets.GOOGLE_KEY}}
-        run: 'echo "$GKEY" > ./terraform/main/tfsecrets.json
+        run: 'echo "$GKEY" > ./terraform/main/tfsecrets.json'
 
       - name: run terraform apply
         working-directory: ./deploy
