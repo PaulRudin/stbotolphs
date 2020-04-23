@@ -1,2 +1,2 @@
-deploy/k8s/.flux.yaml merge=ours
+.flux.yaml merge=ours
 
