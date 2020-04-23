@@ -47,7 +47,7 @@ local port = 8080;
   },
 
   // mixin for a container so that flux will update images
-  local flux_annotations_mixin: {
+  local flux_annotations_mixin = {
     local s = self,
     metadata+: {
       annotations+: {
@@ -55,7 +55,7 @@ local port = 8080;
         ['fluxcd.io/tag.' + s.name]: $.config.image_update_pattern,
       }
     }
-  }
+  },
   deploy: k.Deployment(name) + ns_mixin + {
     spec+: {
       replicas: 1,

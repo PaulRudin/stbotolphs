@@ -1,4 +1,4 @@
 version: 1
 commandUpdated:
   generators:
-    - command: make env=base show
+    - command: '(make env=base show ; make env=staging show ) | cat'
