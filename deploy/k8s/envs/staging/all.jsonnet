@@ -18,7 +18,7 @@ local base = import '../base/all.jsonnet';
   secrets: base.secrets + {
     [k]+: ns_mixin
     for k in std.objectFields(base.secrets)
-  }
+  },
 
   flux: base.flux + {
     nsmix: {
