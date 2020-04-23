@@ -48,15 +48,16 @@ local port = 8080;
 
   // mixin for a container so that flux will update images
   local flux_annotations_mixin = {
-    local s = self,
     metadata+: {
       annotations+: {
         'fluxcd.io/automated': 'true',
-        ['fluxcd.io/tag.' + s.name]: $.config.image_update_pattern,
-      }
-    }
+      } + {
+        ['fluxcd.io/tag.' n]: $.config.image_update_pattern
+        for n in ['default', 'migrate', 'setpw']
+      },
+    },
   },
-  deploy: k.Deployment(name) + ns_mixin + {
+  deploy: k.Deployment(name) + ns_mixin + flux_annotations_mixin + {
     spec+: {
       replicas: 1,
       template+: {
@@ -113,12 +114,12 @@ local port = 8080;
           },
 
           initContainers: [
-            k.Container('migrate') + flux_annotations_mixin + {
+            k.Container('migrate') {
               image: $.globals.images.webapp,
               command: ['./manage.py', 'migrate'],
               env_+: env_data,
             },
-            k.Container('setpw') + flux_annotations_mixin + {
+            k.Container('setpw') {
               image: $.globals.images.webapp,
               // FIXME: this sets initially, but ignores error so that we don't try to create twice
               command: [
@@ -138,7 +139,7 @@ local port = 8080;
           ],
 
           containers_+: {
-            default: k.Container('default') + flux_annotations_mixin + {
+            default: k.Container('default') + {
               image: $.globals.images.webapp,
               resources: {
                 // tune this once we have some data about actual usage
