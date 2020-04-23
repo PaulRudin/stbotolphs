@@ -11,9 +11,10 @@
   local secret_name = 'flux-git-deploy',
 
   local kgdir = '/var/fluxd/keygen',
+  namespace:: 'flux',
   nsmix:: {
     metadata+: {
-      namespace: 'flux',
+      namespace: $.namespace,
     },
   },
 
@@ -80,13 +81,7 @@
 
   secret: k.Secret(secret_name) + nsmix,
 
-  sa: k.ServiceAccount(name) + nsmix + {
-    metadata+: {
-      annotations+: {
-        'iam.gke.io/gcp-service-account': 'cnrm-system@stbots.iam.gserviceaccount.com',
-      },
-    },
-  },
+  sa: k.ServiceAccount(name) + nsmix,
 
   cr: k.ClusterRole(name) {
     rules: [
@@ -112,7 +107,7 @@
       {
         kind: 'ServiceAccount',
         name: name,
-        namespace: name,
+        namespace: $.namespace,
       },
     ],
   }, // crb

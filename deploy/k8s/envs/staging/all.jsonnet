@@ -21,11 +21,7 @@ local base = import '../base/all.jsonnet';
   },
 
   flux: base.flux + {
-    nsmix: {
-      metadata+: {
-        namespace: 'flux-staging'
-      }
-    },
+    namespace: 'flux-staging',
     branch: 'staging',
   },
 }
