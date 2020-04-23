@@ -14,14 +14,8 @@ jobs:
         uses: little-core-labs/install-terraform@v1
 
       - name: Install jsonnet
-        working-directory: /tmp
-        run: |
-          wget https://github.com/google/jsonnet/releases/download/v0.15.0/jsonnet-bin-v0.15.0-linux.tar.gz
-          tar xzf jsonnet-bin-v0.15.0-linux.tar.gz
-          rm jsonnet-bin-v0.15.0-linux.tar.gz
-          chmod a+x jsonnet
-          sudo install jsonnet /usr/local/bin/jsonnet
-        
+        run: ./scripts/install_jsonnet.sh
+
       - name: install kubeseal
         working-directory: /tmp
         run: |
