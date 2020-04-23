@@ -8,10 +8,8 @@ RUN apk update && apk add git vim postgresql-dev libffi-dev gcc musl-dev \
 # From now on, work in the application directory
 WORKDIR /usr/src/app
 
-# Copy Docker configuration and install any requirements. We install
-# requirements/docker.txt last to allow it to override any versions in
-# requirements/requirements.txt.
-ADD ./requirements.txt ./
+# Copy Docker configuration and install any requirements.
+ADD ./requirements-fixed.txt ./
 RUN pip install --no-cache-dir -r requirements-fixed.txt
 
 # Default environment for image.  By default, we use the settings module bundled
