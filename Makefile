@@ -1,6 +1,6 @@
 GIT_SHA := $(shell git rev-parse --short HEAD)
 
-REGISTRY := $(shell jsonnet -e "(import 'deploy/tfdata.json').registry")
+REGISTRY := $(shell jsonnet -e "(import 'deploy/k8s/tfdata.json').registry")
 NAME :=  webapp
 IMAGE_NAME := $(REGISTRY)/$(NAME)
 LOCAL_TAGS := -t $(NAME):$(GIT_SHA) -t $(NAME):latest
