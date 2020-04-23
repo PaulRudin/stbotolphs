@@ -9,7 +9,7 @@
         location: config.zone,
         remove_default_node_pool: true,
         initial_node_count: 1,
-        min_master_version: '1.15',
+        min_master_version: '1.16',
         master_auth: {
           username: '',
           password: '',
