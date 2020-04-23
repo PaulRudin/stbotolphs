@@ -17,12 +17,19 @@ jobs:
         shell: bash
         env:
           GKEY: ${{secrets.GOOGLE_KEY}}
-        run: 'echo "$GKEY" > gsecrets.json'
+        run: |
+          'echo "$GKEY" > gsecrets.json'
+          cat keyfile.json | docker login -u _json_key --password-stdin https://[HOSTNAME]
+
 
       - name: build
         run: make docker
 
       - name: push
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: gsecrets.json
-        run: make push
+        env: 
+          GKEY: ${{secrets.GOOGLE_KEY}}
+
+        run: |
+          # fixme - get the hostname from the registry name
+          'echo "$GKEY"' | docker login -u _json_key --password-stdin https://eu.gcr.io
+          make push
