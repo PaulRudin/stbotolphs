@@ -43,9 +43,12 @@ local utils = import '../utils.jsonnet';
     '../../k8s/tfsecrets.enc.json',
     '${google_kms_crypto_key.crypto_key.self_link}',
     {
-      postgres_password: '${random_password.postgres_pw.result}',
-      cms_bucket_key_id: '${google_storage_hmac_key.%s.access_id}' % $.cms_storage_bucket_key_name,
-      cms_bucket_key_secret: '${google_storage_hmac_key.%s.secret}' % $.cms_storage_bucket_key_name,
+      data: {
+        postgres_password: '${random_password.postgres_pw.result}',
+        cms_bucket_key_id: '${google_storage_hmac_key.%s.access_id}' % $.cms_storage_bucket_key_name,
+        cms_bucket_key_secret: '${google_storage_hmac_key.%s.secret}' % $.cms_storage_bucket_key_name,
+      },
+      name: 'tfsecrets',
     }
   )
 } 

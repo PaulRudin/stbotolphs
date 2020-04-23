@@ -18,6 +18,8 @@ encrypted_secrets = $(shell find . -type f -name '*secrets.enc.json')
 decrypted_secrets = $(encrypted_secrets:.enc.json=.json)
 sealed_secrets = $(decrypted_secrets:.json=.sealed.json)
 
+seal: $(sealed_secrets)
+
 show: $(sealed_secrets)
 	@cd $(kdir)
 	@$(KUBECFG) show all.jsonnet
@@ -42,4 +44,4 @@ fmttest: $(JS_FILES:%=%-fmttest)
 %-fmttest: %
 	jsonnetfmt --test $<
 
-.PHONY: show update diff %-fmt %-fmttest fmt fmttest decrypt_secrets
+.PHONY: show update diff %-fmt %-fmttest fmt fmttest decrypt_secrets seal

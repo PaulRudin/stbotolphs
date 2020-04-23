@@ -21,6 +21,10 @@ jobs:
           chmod a+x jsonnet
           sudo install jsonnet /usr/local/bin/jsonnet
         
+      - name: install kubeseal
+        run: |
+          wget https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.12.1/kubeseal-linux-amd64 -O kubeseal
+          sudo install -m 755 kubeseal /usr/local/bin/kubeseal
           
       - name: install creds file
         working-directory: ./deploy
@@ -36,3 +40,16 @@ jobs:
       - name: run terraform apply
         working-directory: ./deploy
         run: make tfapply
+
+      - name: reseal
+        # if the secrets have changed, then we'll need to make new sealed
+        # versions
+        working-directory: ./deploy/k8s
+        make seal
+
+        # nb - no need to regenerate the k8s manifests, flux does that in cluster.
+        
+        # commit any changes back to the repo
+      - uses: stefanzweifel/git-auto-commit-action@v4.1.4
+        with:
+          commit_message: ci-commit: update changes dependent on tf run
