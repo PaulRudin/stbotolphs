@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - '*'
+      - '!flux-sync'
 jobs:
   build_and_push:
     runs-on: ubuntu-18.04

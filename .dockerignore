@@ -24,3 +24,5 @@ venv/
 README.md
 docs/
 deploy/
+.github
+scripts/

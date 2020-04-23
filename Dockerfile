@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 # requirements/docker.txt last to allow it to override any versions in
 # requirements/requirements.txt.
 ADD ./requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-fixed.txt
 
 # Default environment for image.  By default, we use the settings module bundled
 # with this repo. Change DJANGO_SETTINGS_MODULE to install a custom settings.
