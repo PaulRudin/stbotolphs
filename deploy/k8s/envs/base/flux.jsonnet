@@ -4,7 +4,6 @@
    */
   local k = $.globals.k,
   local env = $.globals.env,
-  local name = 'flux',
   local config = $.globals.config.k8s,
 
   # seems that this has to be the name. not sure why
@@ -17,6 +16,9 @@
       namespace: $.namespace,
     },
   },
+
+  name:: 'flux',
+  local name = $.name,
 
   branch:: 'master',
 

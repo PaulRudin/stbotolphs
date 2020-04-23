@@ -25,5 +25,6 @@ local base = import '../base/all.jsonnet';
     branch: 'staging',
     flux_sync_tag: 'flux-sync-staging',
     git_path: super.git_path + '/envs/staging',
+    name:: 'flux-staging',
   },
 }
