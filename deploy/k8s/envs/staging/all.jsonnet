@@ -23,5 +23,7 @@ local base = import '../base/all.jsonnet';
   flux: base.flux + {
     namespace: 'flux-staging',
     branch: 'staging',
+    git_sync_tag: 'flux-sync-staging',
+    git_path: super.git_path + '/envs/staging',
   },
 }

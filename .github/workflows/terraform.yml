@@ -14,13 +14,10 @@ jobs:
         uses: little-core-labs/install-terraform@v1
 
       - name: Install jsonnet
-        run: ./scripts/install_jsonnet.sh
+        run: ./deploy/scripts/install_jsonnet.sh
 
       - name: install kubeseal
-        working-directory: /tmp
-        run: |
-          wget https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.12.1/kubeseal-linux-amd64 -O kubeseal
-          sudo install -m 755 kubeseal /usr/local/bin/kubeseal
+        run: ./deploy/scripts/install_kubeseal.sh
           
       - name: install creds file
         working-directory: ./deploy

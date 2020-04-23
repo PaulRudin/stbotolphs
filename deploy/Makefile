@@ -2,10 +2,27 @@
 # so we assume that people know when init needs to be run
 # normally we just need to apply - we're remaking some files unncessarily, but they're cheap.
 .DEFAULT_GOAL := tfapply
-.PHONY: tfbootstrap tfinit tfplan tfapply tfshow tfdestroy
-
+.PHONY: tfbootstrap tfinit tfplan tfapply tfshow tfdestroy install_tools bootstrap
 
 makefile_dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+
+project := $(shell jsonnet -e '(import "$(makefile_dir)config.jsonnet").gcloud.project')
+github_user := $(shell jsonnet -e '(import "$(makefile_dir)config.jsonnet").github.user')
+github_repo := $(shell jsonnet -e '(import "$(makefile_dir)config.jsonnet").github.repo')
+
+bootstrap: install_tools tfbootstrap tfinit tfapply
+	cd k8s && $(MAKE) env=base update 
+
+
+install_tools:
+	scripts/install_jsonnet.sh
+	scripts/install_kubecfg.sh
+	scripts/install_kubectl.sh
+	scripts/install_kubeseal.sh
+	scripts/install_sops.sh
+	scripts/install_yq.sh
+	scripts/install_fluxctl.sh
 
 jsonnet = jsonnet
 
@@ -26,7 +43,6 @@ tfbootstrap: $(bootstrap_files)
 	cd terraform/bootstrap; \
 	terraform init; \
 	terraform apply -auto-approve
-
 
 
 tf := GOOGLE_APPLICATION_CREDENTIALS=$(creds_file) terraform

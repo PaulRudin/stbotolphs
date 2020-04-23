@@ -20,7 +20,10 @@
 
   branch:: 'master',
 
+  git_path:: config.flux.git_path,
 
+  flux_sync_tag:: 'flux-sync',
+  
   local nsmix = $.nsmix,
 
   ns: k.Namespace(name),
@@ -47,10 +50,11 @@
                 '--memcached-service=',
                 '--ssh-keygen-dir=%s' % kgdir,
                 '--git-url=%s' % config.flux.git_url,
-                '--git-path=%s' % config.flux.git_path,
+                '--git-path=%s' % $.git_path,
                 '--git-branch=%s' % $.branch,
                 '--git-label=flux-sync',
                 '--git-email=%s' % config.flux.git_email,
+                '--git-sync-tag' % $.flux_sync_tag,
                 '--manifest-generation=true',
                 '--sync-interval=10m',
                 '--sync-timeout=5m',

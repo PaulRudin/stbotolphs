@@ -44,4 +44,5 @@ fmttest: $(JS_FILES:%=%-fmttest)
 %-fmttest: %
 	jsonnetfmt --test $<
 
-.PHONY: show update diff %-fmt %-fmttest fmt fmttest decrypt_secrets seal
+.PHONY: show update diff %-fmt %-fmttest fmt fmttest decrypt_secrets seal staging-branch
+

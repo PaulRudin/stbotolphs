@@ -3,7 +3,12 @@
 */
 
 {
-
+  github: {
+    user: 'PaulRudin',
+    repo: 'stbotolphs',
+  },
+  
+  
   k8s: {
 
     /* this needs to be a subdomain of a domain you control. 
