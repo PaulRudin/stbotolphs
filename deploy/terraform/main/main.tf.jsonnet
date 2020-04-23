@@ -35,6 +35,7 @@ local utils = import '../utils.jsonnet';
             user: 'postgres',
           },
           cms_bucket_name: $.cms_storage_bucket_name,
+          staging_cms_bucket_name: $.staging_bucket,
         }, '  '),
         filename: '../../k8s/tfdata.json',
       },

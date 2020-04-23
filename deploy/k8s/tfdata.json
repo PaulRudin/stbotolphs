@@ -5,5 +5,6 @@
     "ip": "10.3.0.3",
     "user": "postgres"
   },
-  "registry": "eu.gcr.io/stbots"
+  "registry": "eu.gcr.io/stbots",
+  "staging_cms_bucket_name": "staging-stbots-cms"
 }

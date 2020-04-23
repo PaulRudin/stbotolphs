@@ -1,21 +1,23 @@
 {
   local config = $.config,
   cms_storage_bucket_name:: '%s-cms' % config.project,
+  staging_bucket:: 'staging-%s' % $.cms_storage_bucket_name,
+  local buckets = [$.cms_storage_bucket_name, $.staging_bucket],
   cms_storage_bucket_key_name:: '%s-key' % $.cms_storage_bucket_name,
 
   resource+: {
     google_storage_bucket+: {
-      [$.cms_storage_bucket_name]: $.proj_mixin + {
-        name: $.cms_storage_bucket_name,
+      [bucket]: $.proj_mixin + {
+        name: bucket,
         location: config.region,
-      },
+      } for bucket in buckets
     },
 
     google_storage_bucket_acl+: {
-      [$.cms_storage_bucket_name]: {
-        bucket: $.cms_storage_bucket_name,
+      [bucket]: {
+        bucket: bucket,
         predefined_acl: 'publicRead',
-      },
+      } for bucket in buckets
     },
 
     google_service_account+:  {
@@ -25,11 +27,11 @@
     },
 
     google_storage_bucket_iam_member+: {
-      cms_sa: {
-        bucket: $.cms_storage_bucket_name,
+      [bucket]: {
+        bucket: bucket,
         role: 'roles/storage.admin',
         member: 'serviceAccount:${google_service_account.cms.email}', 
-      }
+      } for bucket in buckets
     },
     google_storage_hmac_key+: {
       [$.cms_storage_bucket_key_name]: $.proj_mixin + {
