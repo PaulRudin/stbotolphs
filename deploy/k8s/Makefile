@@ -11,7 +11,7 @@ JSONNET := jsonnet -J $(mkfile_dir) -J $(mkfile_dir)vendor
 	sops -d $< > $@
 
 %secrets.sealed.json: %secrets.json
-	$(JSONNET) --tla-code-file 'secrets=$<' utils/secrets.jsonnet|kubeseal --cert ./kubeseal-public-cert.pem -o json > $@
+	$(JSONNET) --tla-code-file 'secrets=$<' utils/secrets.jsonnet|kubeseal --scope cluster-wide --cert ./kubeseal-public-cert.pem -o json > $@
 
 
 encrypted_secrets = $(shell find . -type f -name '*secrets.enc.json')

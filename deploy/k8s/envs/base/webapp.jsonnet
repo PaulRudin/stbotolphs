@@ -8,16 +8,23 @@ local port = 8080;
     dbhost: g.tfdata.postgres.ip,
     bucket: g.tfdata.cms_bucket_name,
     region: g.config.gcloud.region,
+    namespace: 'default',
+    host: $.globals.root_dns_name,
   },
   local k = $.globals.k,
-  svc: k.Service(name) {
+
+  namespace: k.Namespace($.config.namespace),
+
+  local ns_mixin = { metadata+: {namespace: $.config.namespace }},
+
+  svc: k.Service(name) + ns_mixin + {
     target_pod: $.deploy.spec.template,
   },
 
-  ingress: k.Ingress(name) + k.mixins.TlsIngress + {
+  ingress: k.Ingress(name) + k.mixins.TlsIngress + ns_mixin + {
     spec+: {
       rules: [{
-        host: $.globals.root_dns_name,
+        host: $.config.host,
         http: {
           paths: [
             {
@@ -30,7 +37,7 @@ local port = 8080;
     },
   }, //ingress
 
-  django_secret: k.Secret(name) {
+  django_secret: k.Secret(name) + ns_mixin + {
     metadata+: {
       annotations+: {
         'secret-generator.v1.mittwald.de/autogenerate': 'django_secret_key,admin_password',
@@ -38,7 +45,7 @@ local port = 8080;
     },
   },
 
-  deploy: k.Deployment(name) {
+  deploy: k.Deployment(name) + ns_mixin + {
     spec+: {
       replicas: 1,
       template+: {

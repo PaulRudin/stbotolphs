@@ -3,6 +3,7 @@
     namespace: 'kube-system',
     image: $.globals.images.secretgen,
   },
+
   local ns_mixin = { metadata+: {namespace: $._config.namespace }},
 
   operator: std.native('parseYaml')(importstr 'secretgen/operator.yaml')[0] + ns_mixin + {
