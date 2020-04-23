@@ -52,7 +52,7 @@ local port = 8080;
       annotations+: {
         'fluxcd.io/automated': 'true',
       } + {
-        ['fluxcd.io/tag.' n]: $.config.image_update_pattern
+        ['fluxcd.io/tag.' + n]: $.config.image_update_pattern
         for n in ['default', 'migrate', 'setpw']
       },
     },
