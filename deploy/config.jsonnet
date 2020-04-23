@@ -6,11 +6,15 @@
 
   k8s: {
 
+    /* this needs to be a subdomain of a domain you control. 
+     atm dns record needs to be updated manually
+     */
+    root_dns_name: 'stbots.rudin.co.uk', 
+    
     flux: {
       /* flux will pull from this github repo to apply latest k8s manifests. (Assumed to be public.) */
       
       git_url: 'git@github.com:PaulRudin/stbotolphs',
-      git_branch: 'master',
 
       git_path: 'deploy/k8s',
       

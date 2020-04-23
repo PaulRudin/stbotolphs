@@ -11,11 +11,16 @@
   local secret_name = 'flux-git-deploy',
 
   local kgdir = '/var/fluxd/keygen',
-  local nsmix = {
+  nsmix:: {
     metadata+: {
       namespace: 'flux',
     },
   },
+
+  branch:: 'master',
+
+
+  local nsmix = $.nsmix,
 
   ns: k.Namespace(name),
 
@@ -42,7 +47,7 @@
                 '--ssh-keygen-dir=%s' % kgdir,
                 '--git-url=%s' % config.flux.git_url,
                 '--git-path=%s' % config.flux.git_path,
-                '--git-branch=%s' % config.flux.git_branch,
+                '--git-branch=%s' % $.branch,
                 '--git-label=flux-sync',
                 '--git-email=%s' % config.flux.git_email,
                 '--manifest-generation=true',

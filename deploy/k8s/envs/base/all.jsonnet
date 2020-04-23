@@ -21,7 +21,6 @@ local config = {
   
   globals:: {
     images:: import 'images.jsonnet',
-    root_dns_name:: 'stbots.rudin.co.uk', // atm dns record needs to be updated manually
     k:: import 'klib.libsonnet',
     env:: std.extVar("env"),
     tfdata:: import '../../tfdata.json',

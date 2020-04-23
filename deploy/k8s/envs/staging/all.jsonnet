@@ -19,4 +19,13 @@ local base = import '../base/all.jsonnet';
     [k]+: ns_mixin
     for k in std.objectFields(base.secrets)
   }
+
+  flux: base.flux + {
+    nsmix: {
+      metadata+: {
+        namespace: 'flux-staging'
+      }
+    },
+    branch: 'staging',
+  },
 }

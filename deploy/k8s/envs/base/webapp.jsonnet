@@ -9,7 +9,7 @@ local port = 8080;
     bucket: g.tfdata.cms_bucket_name,
     region: g.config.gcloud.region,
     namespace: 'default',
-    host: $.globals.root_dns_name,
+    host: g.config.root_dns_name,
     image_update_pattern: 'semver:~0'
   },
   local k = $.globals.k,

@@ -1,5 +1,5 @@
 version: 1
 patchUpdated:
   generators:
-    - command: '(make env=base show ; make env=staging show ) | cat'
+    - command: make env=base show
   patchFile: flux-patch.yaml
