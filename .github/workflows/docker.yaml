@@ -1,0 +1,27 @@
+name: Build and push image
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build_and_push:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install jsonnet
+        run: ./scripts/install_jsonnet.sh
+
+      - name: get google creds
+        shell: bash
+        env:
+          GKEY: ${{secrets.GOOGLE_KEY}}
+        run: 'echo "$GKEY" > gsecrets.json'
+
+      - name: build
+        run: make docker
+
+      - name: push
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: gsecrets.json
+        run: make push

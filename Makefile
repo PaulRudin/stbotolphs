@@ -12,11 +12,5 @@ docker:
 push: docker
 	docker push $(IMAGE_NAME)
 
-docker-dev:
-	docker build . --target dev -t $(NAME)-dev:latest
-
-tele:
-	telepresence --swap-deployment k8s-sso \
-	--docker-run --rm -it -v $(shell pwd)/app:/usr/src/app --env-file secrets.env $(NAME)-dev:latest
 
 .PHONY: docker push docker-dev tele
