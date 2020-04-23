@@ -54,11 +54,12 @@
                 '--git-branch=%s' % $.branch,
                 '--git-label=flux-sync',
                 '--git-email=%s' % config.flux.git_email,
-                '--git-sync-tag' % $.flux_sync_tag,
+                '--git-sync-tag=%s' % $.flux_sync_tag,
                 '--manifest-generation=true',
                 '--sync-interval=10m',
                 '--sync-timeout=5m',
               ],
+
               env_: {
                 ENV: env,
               },
