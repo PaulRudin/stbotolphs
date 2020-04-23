@@ -45,7 +45,7 @@ jobs:
         # if the secrets have changed, then we'll need to make new sealed
         # versions
         working-directory: ./deploy/k8s
-        make seal
+        run: make seal
 
         # nb - no need to regenerate the k8s manifests, flux does that in cluster.
         
