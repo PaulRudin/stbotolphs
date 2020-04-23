@@ -13,15 +13,6 @@ jobs:
       - name: install jsonnet
         run: ./scripts/install_jsonnet.sh
 
-      - name: get google creds
-        shell: bash
-        env:
-          GKEY: ${{secrets.GOOGLE_KEY}}
-        run: |
-          'echo "$GKEY" > gsecrets.json'
-          cat keyfile.json | docker login -u _json_key --password-stdin https://[HOSTNAME]
-
-
       - name: build
         run: make docker
 
@@ -31,5 +22,5 @@ jobs:
 
         run: |
           # fixme - get the hostname from the registry name
-          'echo "$GKEY"' | docker login -u _json_key --password-stdin https://eu.gcr.io
+          echo "$GKEY" | docker login -u _json_key --password-stdin https://eu.gcr.io
           make push
