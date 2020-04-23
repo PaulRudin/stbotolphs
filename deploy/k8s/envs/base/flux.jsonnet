@@ -54,7 +54,7 @@
                 '--git-url=%s' % config.flux.git_url,
                 '--git-path=%s' % $.git_path,
                 '--git-branch=%s' % $.branch,
-                '--git-label=flux-sync',
+                '--git-label=%s' % $.flux_sync_tag,
                 '--git-email=%s' % config.flux.git_email,
                 '--git-sync-tag=%s' % $.flux_sync_tag,
                 '--manifest-generation=true',
