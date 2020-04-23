@@ -10,6 +10,7 @@ local base = import '../base/all.jsonnet';
       bucket: g.tfdata.staging_cms_bucket_name,
       namespace: 'staging',
       host: 'staging-' + super.host,
+      image_update_pattern: 'semver:~0-0'
     },
   },
 
