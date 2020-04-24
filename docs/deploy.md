@@ -137,14 +137,7 @@ billing account is necessary.
   automated - on AWS this can be done via annotations on the service, but it
   seems that Google don't have an equivalent.
 
-* Once flux is running add its ssh key as a deploy key to the github
-  project. You can see the key with `fluxctl --k8s-fwd-ns=flux identity`
-
-
-* Make a staging branch based on master, touch a dummy file and push it. This
-  is because the staging deployment monitors this branch for changes in order
-  to deploy. We could use master, but then we'd have to pollute it with
-  pre-release tags.
-
-* Once the staging flux is running add its deploy key too: 
+* There are two versions of flux running, for the staging config and one for
+  the default. Once they're running add their deploy keys via the github ui
+  project. You can see the keys with `fluxctl --k8s-fwd-ns=flux identity` and
   `fluxctl --k8s-fwd-ns=flux-staging identity`
