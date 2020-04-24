@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  namespace: staging
+spec:
+  template:
+    spec:
+      $setElementOrder/containers:
+      - name: default
+      $setElementOrder/initContainers:
+      - name: migrate
+      - name: setpw
+      containers:
+      - image: eu.gcr.io/stbots/webapp:v0.0.6
+        name: default
+      initContainers:
+      - image: eu.gcr.io/stbots/webapp:v0.0.6
+        name: migrate
+      - image: eu.gcr.io/stbots/webapp:v0.0.6
+        name: setpw
