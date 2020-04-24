@@ -15,6 +15,19 @@ The staging version is at https://stbots.rudin.co.uk (it's basically the
 same), but you can see that the database  is different as they have different
 home pages.
 
+Admin user is automatically created in the secret webapp. See e.g. `kubectl get
+secret webapp -o yaml` or `kubectl -n staging get secret webapp -o yaml`.
+
+Migrations are automatically applied, new migrations should be committed so that
+they're built into new docker images after making changes to the data model.
+
+The usual django management commands (or any shell commands) can be run in the
+main pod, e.g.  `kubectl exec -it `kubectl get pod -l name=webapp -o name` --
+sh` to get an interactive shell. Of course, as usual you can trash everything
+by executing commands in the pod so use with care, and think about who has
+permissions to access the cluster api (this depends on the gcloud project
+permissions).
+
 Please do ask if anything is unclear or you run into problems.
 
 Note that git is configured to ignore files matching the pattern
@@ -22,6 +35,11 @@ Note that git is configured to ignore files matching the pattern
 directory, make sure you don't commit them. Git safe secrets are in files like
 "*secrets.enc.json". Secrets are reencrypted with kubeseal for consumption by
 in-cluster workloads.
+
+There's a github workflow that runs periodically to check that the endpoints
+are up, so if this fails you should get an email from github. This also acts as
+a simple check on the automatic provisioning of certificates, since the ping
+will fail with a bad certificate.
 
 
 ## Day to day operations
@@ -61,7 +79,10 @@ Kubernetes volume snap shotting.
 We wouldn't normally configure a whole cluster essentially for a single
 application - the expectation would be that multiple application are deployed
 to the same cluster, so as to get the benefits of efficient resource
-utilisation and consistent monitoring, updating etc.
+utilisation and consistent monitoring, updating etc. With a bit more time I'd
+deploy some in-cluster monitoring and custom metrics. 
+
+
 
 ## Bootstrapping
 
