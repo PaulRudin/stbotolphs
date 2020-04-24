@@ -26,31 +26,34 @@ in-cluster workloads.
 
 ## Day to day operations
 
-Once bootstrapping has been done all changes are via git. You can make changes
-to your web application code, and these will be deployed automatically via
+Once bootstrapping is done all changes are via git. You can make changes to
+your web application code, and these will be deployed automatically via
 tagging. The "production" version should be tagged with a tag of the form
-"v0.x.y" on master. If you ever decide to migrate to a version like "v1.x.y"
-then the file ./deploy/k8s/.flux.yaml should be edited to reflect this (change
-should be obvious).
+"v0.x.y" on master. 
 
-If you want to experiment with pre-production versions then make changes on the
-staging branch and push tags that looks like "v0.x.y-z". This will end up being
-available on the "staging-" variant of the domain name configured (see
-below). Once you're happy with a pre-production version then just merge to
-master and tag without the "-z" suffix.  This works because
-[flux](https://github.com/fluxcd/flux) runs in the k8s cluster and polls github
-for config changes, and the docker registry for newer images.
-
-
-The staging branch is only used by the automation for the configuration in the
-./deploy/k8s/envs/staging directory. The terraform application only
-automatically runs from master.
-
+If you want to experiment with pre-production versions then make changes and
+push tags that looks like "v0.x.y-z". This will end up being available on the
+"staging-" variant of the domain name configured (see below). Once you're happy
+with a pre-production version then just merge to master and tag without the
+"-z" suffix.  This works because [flux](https://github.com/fluxcd/flux) polls
+github for config changes, and the docker registry for newer images.
 
 You might get occasional emails from letsencrypt warning that a certificate is
 about to expire, but IME they're always automatically replaced before they
 expire.
 
+
+## Vendor lock in.
+
+The Terraform config is vendor specific, but all the resources deployed
+have near equivalent on both AWS and Azure (probably others), so this config
+would need to be rewritten to move to a new cloud provider.
+
+The workloads run in a Kubernetes container provisioned via Terraform, and this
+configuration should be vendor agnostic and work with any Kubernetes cluster.
+
+The spec for the job asked for a hosted postgres database, so that's been
+done. But it would probably be better to deploy postgres 
 
 ## Bootstrapping
 
