@@ -3,6 +3,7 @@
 This document describes how to deploy the cms, addressing (most of) the
 requirements in [the requirements](./to-our-cloud-architect.md).
 
+
 There's a bit of bootstrapping, but once that's done *everything* should get
 deployed or updated by github workflows or by processes running in the k8s
 cluster, so you shouldn't need to do anything except via editing files and
@@ -66,7 +67,9 @@ expire.
 
 * Paths are relative to the cloned working directory.
 
-* Check necessary tools at the end of this document - install any you don't have.
+* Check necessary tools at the end of this document - install any you don't
+  have. `cd deploy && make install_tools` will download the relevant binaries
+  and install them in /usr/local/bin.
 
 * Edit the file ./deploy/config.jsonnet. At a minumum you should change:
 
@@ -75,6 +78,8 @@ expire.
 ** `k8s.letsencrypt_email`
 ** `gcloud.billing_account`
 ** `gcloud.extra_users`
+** `github.user`
+** `github.repo`
 
 Note that deploying this stuff will incur charges with google - that's why the
 billing account is necessary.
@@ -133,8 +138,7 @@ billing account is necessary.
   seems that Google don't have an equivalent.
 
 * Once flux is running add its ssh key as a deploy key to the github
-  project. You can see the key with `kubectl -n flux get secrets
-  flux-git-deploy -o yaml|yq r - 'data.identity' |base64 -d`
+  project. You can see the key with `fluxctl --k8s-fwd-ns=flux identity`
 
 
 * Make a staging branch, and switch to it. Edit the file
@@ -142,19 +146,5 @@ billing account is necessary.
   push. This ensure that changes on the staging branch will properly be
   reflected in the staging environment.
 
-
-* Once the staging flux is running add its deploy key too
-
-## Necessary tools
-
-Install the following tools if you don't have them. I assume that you'll
-already have most of them.
-
-* The [gcloud cli](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version).
-
-* [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
-* [sops](https://github.com/mozilla/sops/releases/tag/v3.5.0)
-* [jsonnet](https://github.com/google/jsonnet/releases/tag/v0.15.0)
-* [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-* [kubecfg](https://github.com/bitnami/kubecfg/releases/tag/v0.16.0)
-* [kubeseal](https://github.com/bitnami-labs/sealed-secrets/releases/tag/v0.12.1)
+* Once the staging flux is running add its deploy key too: 
+  `fluxctl --k8s-fwd-ns=flux-staging identity`
