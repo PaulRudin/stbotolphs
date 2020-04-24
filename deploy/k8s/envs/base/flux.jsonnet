@@ -30,13 +30,17 @@
 
   ns: k.Namespace(name),
 
-  deployment: k.Deployment(name) + nsmix + {
+  // to play nicely with fluxctl keep the name of the deployment as flux
+
+  deployment: k.Deployment('flux') + nsmix + {
     spec+: {
       template+: {
         spec+: {
           serviceAccountName: name,
           containers_+: {
             default: k.Container(name) + {
+              metadata+: {
+                
               image: $.globals.images.flux,
               volumeMounts_+: {
                 git_key: {
