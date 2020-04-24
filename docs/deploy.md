@@ -74,7 +74,7 @@ The spec for the job asked for a hosted Postgres database, so that's been
 done. But it would probably be better to deploy Postgres to the cluster. This
 would almost certainly mean better use of resources, but on the flip side we'd
 need to configure backups, but this could be done in a vendor neutral way via
-Kubernetes volume snap shotting.
+Kubernetes volume snapshots.
 
 We wouldn't normally configure a whole cluster essentially for a single
 application - the expectation would be that multiple application are deployed
@@ -82,6 +82,11 @@ to the same cluster, so as to get the benefits of efficient resource
 utilisation and consistent monitoring, updating etc. With a bit more time I'd
 deploy some in-cluster monitoring and custom metrics. 
 
+
+We're also dependent on github workflows, but these are pretty simple and
+mostly invoke scripts or makefiles in the repo, so should be relatively easy to
+re-write for other CI/CD systems. Using flux in the cluster means that we don't
+need third party CI/CD for updating k8s manifests and image updating.
 
 
 ## Bootstrapping
@@ -122,11 +127,13 @@ billing account is necessary.
   terraform configuration from the ./deploy/terraform/. Sometimes terraform
   needs a couple of goes, because remotely provisioned resources can take a
   while. This step is never run by a github workflow, it's assume that these
-  things won't change.
+  things won't change often.
 
 * Go to the github settings for the repo and create a secret called
   "GOOGLE_KEY" and paste in the contents of
-  ./deploy/terraform/main/tfsecrets.json.
+  ./deploy/terraform/main/tfsecrets.json. It seems that Github don't have a
+  tool for doing this from the command line (Travis and others are nicer in
+  this respect).
   
 * Push your changes to github. This should trigger the workflow
   ./.github/workflows/terraform.yaml, which applies the main terraform
@@ -135,7 +142,7 @@ billing account is necessary.
   
   You can also run this step locally by cd'ing to ./deploy and doing `make tfapply`
 
-* Once terraform has done it's thing quite a few resources will have been
+* Once terraform has done it's thing, quite a few resources will have been
   created. You can check this via the gcloud console. All the important stuff
   belongs to the project "stbots" (unless you changed the project name in
   config.jsonnet).
@@ -173,3 +180,28 @@ billing account is necessary.
   the default. Once they're running add their deploy keys via the github ui
   project. You can see the keys with `fluxctl --k8s-fwd-ns=flux identity` and
   `fluxctl --k8s-fwd-ns=flux-staging identity`
+
+
+## Others Points
+
+* I'm not actually certain that the two separate flux deployments are
+  necessary. I did that to solve a problem that I now think is solved in
+  another way, but I haven't checked if things work with just one. But it's
+  harmless as is.
+  
+* I've spent rather more time on this that I originally intended. It could be
+  that in making changes along the way there are things that once worked but
+  now don't quite work as intended. 
+
+  But it's not really practical to create a comprehensive integration test
+  suite just for the purposes of this exercise.
+
+* Although flux seems to work fine, I've not used it that much before and I've
+  had some fun wrangling it. If I were to do things over I think I'd use
+  ArgoCD, which I have more experience with. It lacks the image polling, but
+  it's not hard to write github actions (or whatever) to update k8s config on
+  new images.
+  
+* I've pinned the versions of python packages in the docker build. Reproducible
+  builds are important, and with fuzzy versions you don't really know what
+  you'll get.
