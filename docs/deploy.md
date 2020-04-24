@@ -18,9 +18,9 @@ home pages.
 Please do ask if anything is unclear or you run into problems.
 
 Note that git is configured to ignore files matching the pattern
-"*secrets.json". Some operations will create such files in the working directory,
-make sure you don't commit them. Git safe secrets are in files like
-"*secrets.enc.json". Secrets are reencrypted  with kubeseal for consumption by
+"*secrets.json". Some operations will create such files in the working
+directory, make sure you don't commit them. Git safe secrets are in files like
+"*secrets.enc.json". Secrets are reencrypted with kubeseal for consumption by
 in-cluster workloads.
 
 
@@ -52,8 +52,11 @@ would need to be rewritten to move to a new cloud provider.
 The workloads run in a Kubernetes container provisioned via Terraform, and this
 configuration should be vendor agnostic and work with any Kubernetes cluster.
 
-The spec for the job asked for a hosted postgres database, so that's been
-done. But it would probably be better to deploy postgres 
+The spec for the job asked for a hosted Postgres database, so that's been
+done. But it would probably be better to deploy Postgres to the cluster. This
+would almost certainly mean better use of resources, but on the flip side we'd
+need to configure backups, but this could be done in a vendor neutral way via
+Kubernetes volume snap shotting.
 
 ## Bootstrapping
 

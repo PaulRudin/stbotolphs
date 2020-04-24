@@ -16,10 +16,10 @@ jobs:
         working-directory: ./deploy
         run: echo ::set-output name=url::$(jsonnet -e '(import "config.jsonnet").k8s.root_dns_name')
 
-        - name: check main webapp
-          uses: jtalk/url-health-check-action@v1.2
-          with:
-            url: https://${{ steps.url.outputs.url }}
+      - name: check main webapp
+        uses: jtalk/url-health-check-action@v1.2
+        with:
+          url: https://${{ steps.url.outputs.url }}
 
       - name: check staging webapp
         uses: jtalk/url-health-check-action@v1.2
