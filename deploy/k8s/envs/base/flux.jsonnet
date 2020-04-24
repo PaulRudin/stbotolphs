@@ -39,8 +39,6 @@
           serviceAccountName: name,
           containers_+: {
             default: k.Container(name) + {
-              metadata+: {
-                
               image: $.globals.images.flux,
               volumeMounts_+: {
                 git_key: {
