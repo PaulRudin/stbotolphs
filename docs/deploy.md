@@ -42,9 +42,9 @@ master and tag without the "-z" suffix.  This works because
 for config changes, and the docker registry for newer images.
 
 
-The staging branch is only used by the
-automation for the configuration in the ./deploy/k8s/envs/staging
-directory. The terraform application only automatically runs from master.
+The staging branch is only used by the automation for the configuration in the
+./deploy/k8s/envs/staging directory. The terraform application only
+automatically runs from master.
 
 
 You might get occasional emails from letsencrypt warning that a certificate is
@@ -141,10 +141,10 @@ billing account is necessary.
   project. You can see the key with `fluxctl --k8s-fwd-ns=flux identity`
 
 
-* Make a staging branch, and switch to it. Edit the file
-  ./deploy/k8s/.flux.yaml, replacing "base" with "staging". Commit and
-  push. This ensure that changes on the staging branch will properly be
-  reflected in the staging environment.
+* Make a staging branch based on master, touch a dummy file and push it. This
+  is because the staging deployment monitors this branch for changes in order
+  to deploy. We could use master, but then we'd have to pollute it with
+  pre-release tags.
 
 * Once the staging flux is running add its deploy key too: 
   `fluxctl --k8s-fwd-ns=flux-staging identity`
