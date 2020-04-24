@@ -58,6 +58,11 @@ would almost certainly mean better use of resources, but on the flip side we'd
 need to configure backups, but this could be done in a vendor neutral way via
 Kubernetes volume snap shotting.
 
+We wouldn't normally configure a whole cluster essentially for a single
+application - the expectation would be that multiple application are deployed
+to the same cluster, so as to get the benefits of efficient resource
+utilisation and consistent monitoring, updating etc.
+
 ## Bootstrapping
 
 * This should work fine on any widely used linux (I'm using Ubuntu

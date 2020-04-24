@@ -1,7 +1,7 @@
 local tfdata = import '../../tfdata.json';
 {
   postgres: 'postgres:11.4',
-  webapp: '%s/webapp:latest' % tfdata.registry,
+  webapp: '%s/webapp:v0.0.6' % tfdata.registry,
   cert_manager: 'bitnami/cert-manager:0.13.1',
   flux: 'xamaral/fluxkcfg:0.0.6',
   flux_memcached: 'memcached:1.5.15',
