@@ -59,4 +59,4 @@ tablib==1.1.0
 Unidecode==1.1.1
 urllib3==1.25.9
 webencodings==0.5.1
-whitenoise==5.0.1
+whitenoise==5.0.0
