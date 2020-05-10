@@ -7,11 +7,11 @@ local utils = import '../utils.jsonnet';
 
 + (import './project.jsonnet')
 
-+ (import './cluster.jsonnet')
+//+ (import './cluster.jsonnet')
 
 + (import './registry.jsonnet')
 
-+ (import './db.jsonnet')
+//+ (import './db.jsonnet')
 
 + (import './crypto.jsonnet')
 
@@ -31,7 +31,7 @@ local utils = import '../utils.jsonnet';
           crypto_key: '${google_kms_crypto_key.crypto_key.self_link}',
           
           postgres: {
-            ip: '${google_sql_database_instance.%s.private_ip_address}' % config.postgres.name,
+            // ip: '${google_sql_database_instance.%s.private_ip_address}' % config.postgres.name,
             user: 'postgres',
           },
           cms_bucket_name: $.cms_storage_bucket_name,
@@ -45,7 +45,7 @@ local utils = import '../utils.jsonnet';
     '${google_kms_crypto_key.crypto_key.self_link}',
     {
       data: {
-        postgres_password: '${random_password.postgres_pw.result}',
+       // postgres_password: '${random_password.postgres_pw.result}',
         cms_bucket_key_id: '${google_storage_hmac_key.%s.access_id}' % $.cms_storage_bucket_key_name,
         cms_bucket_key_secret: '${google_storage_hmac_key.%s.secret}' % $.cms_storage_bucket_key_name,
       },

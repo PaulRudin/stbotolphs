@@ -39,8 +39,8 @@
         cluster:  config.cluster_name,
         initial_node_count: 1,
         autoscaling: {
-          max_node_count: 5,
-          min_node_count: 1,
+          max_node_count: 10,
+          min_node_count: 3,
         },
         node_config: {
           machine_type: 'g1-small',

@@ -1,9 +1,11 @@
 name: Build and push image
 on:
   push:
-    tags:
-      - '*'
-      - '!flux-*'
+    branches-ignore:
+      - '**'
+    # tags:
+    #   - '*'
+    #   - '!flux-*'
 jobs:
   build_and_push:
     runs-on: ubuntu-18.04
