@@ -13,10 +13,10 @@ spec:
       - name: migrate
       - name: setpw
       containers:
-      - image: eu.gcr.io/stbots/webapp:v0.0.6
+      - image: eu.gcr.io/stbots/webapp:v0.0.7
         name: default
       initContainers:
-      - image: eu.gcr.io/stbots/webapp:v0.0.6
+      - image: eu.gcr.io/stbots/webapp:v0.0.7
         name: migrate
-      - image: eu.gcr.io/stbots/webapp:v0.0.6
+      - image: eu.gcr.io/stbots/webapp:v0.0.7
         name: setpw
